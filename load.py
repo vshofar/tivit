@@ -3,12 +3,13 @@ import csv
 import os
 import sys
 import json
-import requests
 
-# If you find a solution that does not need the two paths, please comment!
+
+#add django project path to sys.path to let project 'feira' app loading in offline mode
 sys.path.append('/home/zack/program/prova/tivit')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'tivit.settings'
 
+#load django project 
 import django
 django.setup()
 
@@ -19,9 +20,15 @@ args = sys.argv
 OK = 1
 NOK = 0
 
+# error message strings
 ERROR_INVALID_ARG_NUMBER = "script execution requires one .csv file argument."
 ERROR_ARG_INVALID_FILE = "the argument provided is not a a valid .csv file."
 
+
+'''
+ dictionary to store relation between cvs colunm field names and django 'feira' model field names
+ must be use to translate cvs jason load data to 'feira' serialized objects.
+'''
 DIC_TRANSLATE_FIELDS = { 
                         'LONG'      :'log',
                         'LAT'       :'lat',
@@ -41,6 +48,7 @@ DIC_TRANSLATE_FIELDS = {
                         'REFERENCIA':'referencia'}
 
 
+# cvs column names to be load from .cvs inout file
 CSV_NAMES =       ( "ID",
                     "LONG",	
                     "LAT",	
@@ -61,55 +69,87 @@ CSV_NAMES =       ( "ID",
 
 
 def storeData(dicData): 
+    '''
+       create 'feira' serialize object from a dictionary
+       to validate data and save it to database.  
+    '''
+
     serializer = FeiraSerializer(data=dicData)
     if (serializer.is_valid()):
         serializer.save()
         return OK
     else:
-        return N_OK
+        return NOK
          
 
     
 
 def loadData(csvFile):
+
+    '''
+        load 'feira' data records from .csv file, valildate and store it to database.
+    '''
     
+    # load file    
     csvfile = open(csvFile, 'r')
     json_data = json.dumps({})
 
+    # validate columns    
     reader = csv.DictReader( csvfile, CSV_NAMES)    
     
     i=1   
     for row in reader:
 
+        #discart first column names row        
         if(i != 1):           
        
-            # translate cvs column names to model field names        
+            # translate cvs column names to 'feira' model field names        
             for csvColumn in DIC_TRANSLATE_FIELDS:
                 row[DIC_TRANSLATE_FIELDS[csvColumn]] = row.pop(csvColumn)
 
             
+            # vallaidate and save data            
             result = storeData(row) 
+            
+            # inform about non compliant data
             if(result == NOK):
-                message = "invalid data at row - %s" %i            
+                message = "invalid data at row - %s" %i
+            else:
+                message = "row %s data inserted." %i
+            
+            print (message)          
             
         
         i = i+1       
 
     
+def main():
 
-if (len(args) != 2):
-    print (ERROR_INVALID_ARG_NUMBER)
+    '''
+        validate script input and call method to store csv data
+    '''
 
-else:
-    arg1 = args[1]
-
-    if(not os.path.isfile(arg1)):
-        print (ERROR_ARG_INVALID_FILE)
+    #validate args amount    
+    if (len(args) != 2):
+        print (ERROR_INVALID_ARG_NUMBER)
+        return
     
-    elif not arg1.endswith('.csv'):
-        print (ERROR_ARG_INVALID_FILE)
+    input_file = args[1]
 
-    else:
-        loadData(arg1)
+    # valiate arg[1] is a valid file
+    if(not os.path.isfile(input_file)):
+        print (ERROR_ARG_INVALID_FILE)
+        return
+    
+    # validate arg[1] is a .csv file        
+    if not input_file.endswith('.csv'):
+        print (ERROR_ARG_INVALID_FILE)
+        return
+
+    #store cvs data                
+    loadData(input_file)
+
+if __name__ == "__main__":
+    main()
 
 

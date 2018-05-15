@@ -21,7 +21,7 @@ class Feira(models.Model):
     regiao8         = models.CharField(max_length=20)
 
     nome_feira      = models.CharField(max_length=200)
-    registro        = models.CharField(max_length=20)
+    registro        = models.CharField(max_length=20,unique=True)
     
     logradouro      = models.CharField(max_length=250)
     numero          = models.CharField(max_length=50,blank=True)

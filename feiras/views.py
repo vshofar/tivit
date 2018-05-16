@@ -26,13 +26,13 @@ def feira_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
-def feira_detail(request, pk):
+def feira_detail(request, registro):
 
     """
     Retrieve, update or delete a feira data.
     """
     try:
-        feira = Feira.objects.get(pk=pk)
+        feira = Feira.objects.get(registro=registro)
     except Feira.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 

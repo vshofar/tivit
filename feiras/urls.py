@@ -1,7 +1,8 @@
 from django.conf.urls import url
 from feiras import views
+from django.urls import path
 
 urlpatterns = [
-    url(r'^feira/$', views.feira_list),
-    url(r'^feira/(?P<pk>[0-9]+)/$', views.feira_detail),
+    path(r'feira/', views.feira_list),
+    path(r'feira/<str:registro>/', views.feira_detail),
 ]

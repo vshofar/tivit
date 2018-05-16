@@ -81,7 +81,7 @@ class QueryFeiraTests(APITestCase):
         stored = fstored.toJson()                
                 
         #request remote data by id
-        response = self.client.get('/feira/%s/'%fstored.id, format='json')
+        response = self.client.get('/feira/%s/'%fstored.registro, format='json')
 
         #validate status code
         self.assertIs(response.status_code,requests.codes.ok)
@@ -180,16 +180,16 @@ class RemoveFeiraTests(APITestCase):
         load.loadData(os.path.abspath(self.test_data_path))
 
         #get specific record 
-        id_to_remove = Feira.objects.all()[0].id        
+        registro_to_remove = Feira.objects.all()[0].registro       
             
         #request delete data
-        response = self.client.delete('/feira/%s/'%id_to_remove, format='json')
+        response = self.client.delete('/feira/%s/'%registro_to_remove, format='json')
 
         #validate status code        
         self.assertIs(response.status_code,requests.codes.no_content)
 
         #validate database status
-        self.assertIs(len(Feira.objects.filter(id=id_to_remove)) == 0,True)
+        self.assertIs(len(Feira.objects.filter(registro=registro_to_remove)) == 0,True)
 
 
 

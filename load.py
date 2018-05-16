@@ -6,7 +6,6 @@ import json
 
 
 #add django project path to sys.path to let project 'feira' app loading in offline mode
-sys.path.append('/home/zack/program/prova/tivit')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'tivit.settings'
 
 #load django project 
@@ -75,11 +74,12 @@ def storeData(dicData):
     '''
 
     serializer = FeiraSerializer(data=dicData)
-    if (serializer.is_valid()):
-        serializer.save()
-        return OK
-    else:
+    if (not serializer.is_valid()):
         return NOK
+
+    serializer.save()
+    return OK
+           
          
 
     
@@ -108,7 +108,7 @@ def loadData(csvFile):
                 row[DIC_TRANSLATE_FIELDS[csvColumn]] = row.pop(csvColumn)
 
             
-            # vallaidate and save data            
+            # validate and save data            
             result = storeData(row) 
             
             # inform about non compliant data

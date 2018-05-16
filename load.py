@@ -82,7 +82,33 @@ def storeData(dicData):
     return OK
            
          
+def readCsvData(csvFile):
+    '''
+        read .csv file content and return as list of dictionary objects
+    '''
 
+    # load file    
+    csvfile = open(csvFile, 'r')
+    result = []
+
+    # validate columns    
+    reader = csv.DictReader( csvfile, CSV_NAMES)    
+    
+    i=1   
+    
+    for row in reader:
+
+        #discart first column names row        
+        if(i != 1):           
+       
+            # translate cvs column names to 'feira' model field names        
+            for csvColumn in DIC_TRANSLATE_FIELDS:
+                row[DIC_TRANSLATE_FIELDS[csvColumn]] = row.pop(csvColumn)
+                result.append(row)
+
+        i = i+1
+
+    return result
     
 
 def loadData(csvFile):

@@ -43,7 +43,7 @@ class QueryFeiraTests(APITestCase):
         lresponse.sort(key=operator.itemgetter('registro')) 
        
         
-        #self.assertIs(diff,False) 
+        
         self.assertIs(lstored==lresponse,True)
  
         
@@ -68,7 +68,7 @@ class QueryFeiraTests(APITestCase):
 
 
         """
-            GET feiras/ retrieve specific record by id field
+            GET feiras/id/ retrieve specific record by id field
         """
 
         #populate database with valid data
@@ -90,6 +90,79 @@ class QueryFeiraTests(APITestCase):
 
         #validate remote data retrieved             
         self.assertIs(stored==remote_data,True) 
+
+
+
+
+class EditFeiraTests(APITestCase):
+
+    test_data_path = 'feiras/data/test-data.csv'
+
+    
+    def test_insert_new_valid_record(self):
+
+
+        """
+            POST feiras/ data={new valid data} insert a new record
+        """
+        
+        ldata = load.readCsvData(self.test_data_path)
+        feira_to_insert = ldata[0]
+            
+        #request data insert
+        response = self.client.post('/feira/', data=feira_to_insert ,format='json')
+
+        self.assertIs(response.status_code,requests.codes.created)
+
+        #get feira records in json format
+        fstored = Feira.objects.all()[0].toJson()
+
+        #convert all field data to string to let comparison with csv data
+        fstored = dict((k,str(v)) for k,v in fstored.items())
+
+        # remove id field. it must be diferent.     
+        feira_to_insert.pop('ID')
+        fstored.pop('id')
+
+        self.assertIs(feira_to_insert==fstored,True)
+
+
+
+    def test_insert_new_invalid_record(self):
+
+
+        """
+            POST feiras/ data={new invalid data} must not insert the new record
+        """
+        
+        ldata = load.readCsvData(self.test_data_path)
+        feira_to_insert = ldata[0]
+
+        #insert error on number field
+        feira_to_insert['log'] = 'invalid_number'
+            
+        #request data insert
+        response = self.client.post('/feira/', data=feira_to_insert ,format='json')
+
+        self.assertIs(response.status_code==requests.codes.bad_request,True)
+
+
+
+    def test_insert_new_empty_record(self):
+
+        """
+            POST feiras/ data={empty} must not insert the new record
+        """        
+        
+        feira_to_insert = {}
+
+                    
+        #request data insert
+        response = self.client.post('/feira/', data=feira_to_insert ,format='json')
+
+        self.assertIs(response.status_code==requests.codes.bad_request,True)
+
+        
  
           
         

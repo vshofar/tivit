@@ -34,17 +34,13 @@ class QueryFeiraTests(APITestCase):
         #request remote data
         response = self.client.get('/feira/', format='json')
 
-        self.assertIs(response.status_code,requests.codes.ok)
+        self.assertEqual(response.status_code,requests.codes.ok)
 
         lresponse = response.json()
 
-        # sort dictionary list to be compared        
-        lstored.sort(key=operator.itemgetter('registro'))
-        lresponse.sort(key=operator.itemgetter('registro')) 
-       
+          
         
-        
-        self.assertIs(lstored==lresponse,True)
+        self.assertListEqual(lstored,lresponse)
  
         
         
@@ -59,10 +55,10 @@ class QueryFeiraTests(APITestCase):
 
               
         # valaidate status code
-        self.assertIs(response.status_code,requests.codes.ok)
+        self.assertEqual(response.status_code,requests.codes.ok)
 
         #validate reponse content 
-        self.assertIs(json.dumps([]),json.dumps(response.json())) 
+        self.assertListEqual([],response.json()) 
 
     def test_retrieve_specific_data(self):
 
@@ -84,12 +80,12 @@ class QueryFeiraTests(APITestCase):
         response = self.client.get('/feira/%s/'%fstored.registro, format='json')
 
         #validate status code
-        self.assertIs(response.status_code,requests.codes.ok)
+        self.assertEqual(response.status_code,requests.codes.ok)
 
         remote_data = response.json()
 
         #validate remote data retrieved             
-        self.assertIs(stored==remote_data,True) 
+        self.assertDictEqual(stored,remote_data) 
 
 
 
@@ -112,7 +108,7 @@ class InsertFeiraTests(APITestCase):
         #request data insert
         response = self.client.post('/feira/', data=feira_to_insert ,format='json')
 
-        self.assertIs(response.status_code,requests.codes.created)
+        self.assertEqual(response.status_code,requests.codes.created)
 
         #get feira records in json format
         fstored = Feira.objects.all()[0].toJson()
@@ -124,7 +120,7 @@ class InsertFeiraTests(APITestCase):
         feira_to_insert.pop('ID')
         fstored.pop('id')
 
-        self.assertIs(feira_to_insert==fstored,True)
+        self.assertDictEqual(feira_to_insert,fstored)
 
 
 
@@ -144,7 +140,7 @@ class InsertFeiraTests(APITestCase):
         #request data insert
         response = self.client.post('/feira/', data=feira_to_insert ,format='json')
 
-        self.assertIs(response.status_code==requests.codes.bad_request,True)
+        self.assertEqual(response.status_code,requests.codes.bad_request)
 
 
 
@@ -160,7 +156,7 @@ class InsertFeiraTests(APITestCase):
         #request data insert
         response = self.client.post('/feira/', data=feira_to_insert ,format='json')
 
-        self.assertIs(response.status_code==requests.codes.bad_request,True)
+        self.assertEqual(response.status_code,requests.codes.bad_request)
 
 
 
@@ -180,16 +176,16 @@ class RemoveFeiraTests(APITestCase):
         load.loadData(os.path.abspath(self.test_data_path))
 
         #get specific record 
-        registro_to_remove = Feira.objects.all()[0].registro       
+        registro_to_remove = Feira.objects.all()[0].registro      
             
         #request delete data
         response = self.client.delete('/feira/%s/'%registro_to_remove, format='json')
 
         #validate status code        
-        self.assertIs(response.status_code,requests.codes.no_content)
+        self.assertEqual(response.status_code,requests.codes.no_content)
 
         #validate database status
-        self.assertIs(len(Feira.objects.filter(registro=registro_to_remove)) == 0,True)
+        self.assertEqual(len(Feira.objects.filter(registro=registro_to_remove)),0)
 
 
 
@@ -213,12 +209,73 @@ class RemoveFeiraTests(APITestCase):
         response = self.client.delete('/feira/%s/'%registro_to_remove, format='json')
 
         #validate status code        
-        self.assertIs(response.status_code==requests.codes.not_found,True)
+        self.assertEqual(response.status_code,requests.codes.not_found)
 
         qtd_stored_after = len(Feira.objects.all())
 
         #validate database status
-        self.assertIs(qtd_stored_before == qtd_stored_after,True)
+        self.assertEqual(qtd_stored_before,qtd_stored_after)
+
+
+class UpdateFeiraTests(APITestCase):
+
+    test_data_path = 'feiras/data/test-data.csv'
+
+    
+    def test_update_valid_record(self):
+
+
+        """
+            PUT feiras/{valid data} must update a record
+        """
+        
+        #populate database with valid data
+        load.loadData(os.path.abspath(self.test_data_path))
+
+        #get specific record 
+        f_object = Feira.objects.all()[0]
+
+        #change some data        
+        f_object.regiao5 = 'nova regiao'
+        f_object.log    = 34343434       
+            
+        #request update data
+        response = self.client.put('/feira/%s/'%f_object.registro,data=f_object.toJson(),format='json')
+
+        #validate status code        
+        self.assertEqual(response.status_code,requests.codes.ok)
+
+        #validate database status  
+
+        self.assertDictEqual(Feira.objects.get(registro=f_object.registro).toJson(),f_object.toJson())
+
+
+    def test_update_invalid_record(self):
+
+
+        """
+            PUT feiras/{invalid data} must not update a record
+        """
+        
+        #populate database with valid data
+        load.loadData(os.path.abspath(self.test_data_path))
+
+        #get specific record 
+        f_object = Feira.objects.all()[0]
+
+        #change some data        
+        f_object.regiao5 = 'nova regiao'
+        f_object.log    = 'invalid value'      
+            
+        #request update data
+        response = self.client.put('/feira/%s/'%f_object.registro,data=f_object.toJson(),format='json')
+
+        #validate status code        
+        self.assertEqual(response.status_code,requests.codes.bad_request)
+
+        #validate database status 
+        self.assertNotEqual(Feira.objects.get(registro=f_object.registro).toJson(),f_object.toJson())
+
         
         
 

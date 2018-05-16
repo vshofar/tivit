@@ -87,6 +87,114 @@ class QueryFeiraTests(APITestCase):
         #validate remote data retrieved             
         self.assertDictEqual(stored,remote_data) 
 
+    def test_query_by_distrito(self):
+
+
+        """
+            GET feiras/distrito/ retrieve records by 'distrito' field
+        """
+
+        #populate database with valid data
+        load.loadData(os.path.abspath(self.test_data_path))
+
+        #get specific record 
+        fdistrito = Feira.objects.all()[0].distrito
+        lstored = [f.toJson() for f in Feira.objects.filter(distrito=fdistrito)]
+
+        #request remote data by distrito
+        response = self.client.get('/feira/distrito/%s/'%fdistrito, format='json')
+
+        #validate status code
+        self.assertEqual(response.status_code,requests.codes.ok)
+
+        lremote = response.json()
+
+        #validate remote data retrieved             
+        self.assertListEqual(lstored,lremote) 
+
+    def test_query_by_regiao5(self):
+
+
+        """
+            GET feiras/regiao5/ retrieve records by 'distrito' field
+        """
+
+        #populate database with valid data
+        load.loadData(os.path.abspath(self.test_data_path))
+
+        #get specific record 
+        fregiao5 = Feira.objects.all()[0].regiao5
+        lstored = [f.toJson() for f in Feira.objects.filter(regiao5=fregiao5)]
+                      
+                
+        #request remote data by distrito
+        response = self.client.get('/feira/regiao5/%s/'%fregiao5, format='json')
+
+        #validate status code
+        self.assertEqual(response.status_code,requests.codes.ok)
+
+        lremote = response.json()
+
+        #validate remote data retrieved             
+        self.assertListEqual(lstored,lremote) 
+
+
+
+    def test_query_by_bairro(self):
+
+
+        """
+            GET feiras/bairro/ retrieve records by 'bairro' field
+        """
+
+        #populate database with valid data
+        load.loadData(os.path.abspath(self.test_data_path))
+
+        #get specific record 
+        fbairro = Feira.objects.all()[0].bairro
+        lstored = [f.toJson() for f in Feira.objects.filter(bairro=fbairro)]
+                      
+                
+        #request remote data by distrito
+        response = self.client.get('/feira/bairro/%s/'%fbairro, format='json')
+
+        #validate status code
+        self.assertEqual(response.status_code,requests.codes.ok)
+
+        lremote = response.json()
+
+        #validate remote data retrieved             
+        self.assertListEqual(lstored,lremote) 
+
+    def test_query_by_bairro(self):
+
+
+        """
+            GET feiras/nome-feira/ retrieve records by 'nome_feira' field
+        """
+
+        #populate database with valid data
+        load.loadData(os.path.abspath(self.test_data_path))
+
+        #get specific record 
+        fnome_feira = Feira.objects.all()[0].nome_feira
+        lstored = [f.toJson() for f in Feira.objects.filter(nome_feira=fnome_feira)]
+                      
+                
+        #request remote data by distrito
+        response = self.client.get('/feira/nome-feira/%s/'%fnome_feira, format='json')
+
+        #validate status code
+        self.assertEqual(response.status_code,requests.codes.ok)
+
+        lremote = response.json()
+
+        #validate remote data retrieved             
+        self.assertListEqual(lstored,lremote) 
+
+
+
+
 
 
 

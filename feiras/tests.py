@@ -94,7 +94,7 @@ class QueryFeiraTests(APITestCase):
 
 
 
-class EditFeiraTests(APITestCase):
+class InsertFeiraTests(APITestCase):
 
     test_data_path = 'feiras/data/test-data.csv'
 
@@ -161,6 +161,69 @@ class EditFeiraTests(APITestCase):
         response = self.client.post('/feira/', data=feira_to_insert ,format='json')
 
         self.assertIs(response.status_code==requests.codes.bad_request,True)
+
+
+
+class RemoveFeiraTests(APITestCase):
+
+    test_data_path = 'feiras/data/test-data.csv'
+
+    
+    def test_remove_valid_record(self):
+
+
+        """
+            DELETE feiras/id remove a valid record
+        """
+        
+        #populate database with valid data
+        load.loadData(os.path.abspath(self.test_data_path))
+
+        #get specific record 
+        id_to_remove = Feira.objects.all()[0].id        
+            
+        #request delete data
+        response = self.client.delete('/feira/%s/'%id_to_remove, format='json')
+
+        #validate status code        
+        self.assertIs(response.status_code,requests.codes.no_content)
+
+        #validate database status
+        self.assertIs(len(Feira.objects.filter(id=id_to_remove)) == 0,True)
+
+
+
+    def test_remove_invalid_record(self):
+
+
+        """
+            DELETE feiras/id must not remove invalid record
+        """
+        
+        #populate database with valid data
+        load.loadData(os.path.abspath(self.test_data_path))
+
+        qtd_stored_before = len(Feira.objects.all())
+        self.assertIs(qtd_stored_before>1,True)
+
+        #get specific record 
+        id_to_remove = 200     
+            
+        #request delete data
+        response = self.client.delete('/feira/%s/'%id_to_remove, format='json')
+
+        #validate status code        
+        self.assertIs(response.status_code==requests.codes.not_found,True)
+
+        qtd_stored_after = len(Feira.objects.all())
+
+        #validate database status
+        self.assertIs(qtd_stored_before == qtd_stored_after,True)
+        
+        
+
+        
+
 
         
  

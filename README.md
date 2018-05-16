@@ -1,4 +1,4 @@
-#tivit 'feiras' rest api
+# tivit 'feiras' rest api
 
     This project aims to provide a REST api to query and manage some recorded data.
     It is based on python django framework and SQLite database.
@@ -14,9 +14,7 @@
         git clone https://github.com/vshofar/tivit.git
 
     virtualenv:
-        
-
-        pip install virtualenv           
+                      
         virtualenv env
         source env/bin/activate        
 
@@ -27,8 +25,25 @@
         pip install requests
 
 # running api service
+    inside 'project' folder:
+        cd tivit
+        python manage.py migrate 
+        python manage.py runserver #keep the script running
+
+        open following address on web browser:
+        http://127.0.0.1:8000/feira/ #an web page must be displayed with empty json data
+    
 
 # loading data from .csv file
+
+    inside 'project' folder:
+        source env/bin/activate
+        cd tivit
+        python load.py feiras/data/test-data.csv #another compliant .csv file path may be used.
+       
+        #refresh in browser the following the 'http://127.0.0.1:8000/feira/' address
+        # the web page must display an json array with two objects
+
 
 # running tests
 

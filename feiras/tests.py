@@ -276,6 +276,33 @@ class UpdateFeiraTests(APITestCase):
         #validate database status 
         self.assertNotEqual(Feira.objects.get(registro=f_object.registro).toJson(),f_object.toJson())
 
+
+
+    def test_update_registro(self):
+
+
+        """
+            PUT feiras/{registro changed} must not update a record
+        """
+        
+        #populate database with valid data
+        load.loadData(os.path.abspath(self.test_data_path))
+
+        #get specific record 
+        f_object = Feira.objects.all()[0]
+
+        #change some data        
+        f_object.registro = 'novo registro'
+            
+            
+        #request update data
+        response = self.client.put('/feira/%s/'%f_object.registro,data=f_object.toJson(),format='json')
+
+        #validate status code        
+        self.assertEqual(response.status_code,requests.codes.not_found)
+
+        
+
         
         
 

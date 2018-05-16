@@ -173,7 +173,7 @@ class RemoveFeiraTests(APITestCase):
 
 
         """
-            DELETE feiras/id remove a valid record
+            DELETE feiras/registro remove a valid record
         """
         
         #populate database with valid data
@@ -207,10 +207,10 @@ class RemoveFeiraTests(APITestCase):
         self.assertIs(qtd_stored_before>1,True)
 
         #get specific record 
-        id_to_remove = 200     
+        registro_to_remove = 200     
             
         #request delete data
-        response = self.client.delete('/feira/%s/'%id_to_remove, format='json')
+        response = self.client.delete('/feira/%s/'%registro_to_remove, format='json')
 
         #validate status code        
         self.assertIs(response.status_code==requests.codes.not_found,True)

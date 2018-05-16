@@ -68,6 +68,7 @@ CSV_NAMES =       ( "ID",
 
 
 def storeData(dicData): 
+
     '''
        create 'feira' serialize object from a dictionary
        to validate data and save it to database.  
@@ -98,6 +99,7 @@ def loadData(csvFile):
     reader = csv.DictReader( csvfile, CSV_NAMES)    
     
     i=1   
+    result = ""
     for row in reader:
 
         #discart first column names row        
@@ -109,18 +111,19 @@ def loadData(csvFile):
 
             
             # validate and save data            
-            result = storeData(row) 
+            s_result = storeData(row) 
             
             # inform about non compliant data
-            if(result == NOK):
+            if(s_result == NOK):
                 message = "invalid data at row - %s" %i
             else:
                 message = "row %s data inserted." %i
             
-            print (message)          
+            result += "\n %s" %message          
             
         
-        i = i+1       
+        i = i+1
+    return result
 
     
 def main():
@@ -147,7 +150,7 @@ def main():
         return
 
     #store cvs data                
-    loadData(input_file)
+    print (loadData(input_file))
 
 if __name__ == "__main__":
     main()

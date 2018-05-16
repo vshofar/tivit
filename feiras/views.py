@@ -14,6 +14,7 @@ def feira_list(request):
         serializer = FeiraSerializer(feiras, many=True)
 
         return Response(serializer.data)
+        
 
     elif request.method == 'POST':
         

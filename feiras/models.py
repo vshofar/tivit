@@ -1,4 +1,7 @@
 from django.db import models
+from django.forms.models import model_to_dict
+import json
+
 
 class Feira(models.Model):
 
@@ -32,7 +35,15 @@ class Feira(models.Model):
     def __str__(self):
         return self.nome_feira
 
+    def toJson(self):
+        dic = model_to_dict(self, fields=[field.name for field in self._meta.fields])
+        return dic
+        
+
+
     class Meta:
         ordering = ('id',)
+
+    
 
     
